@@ -1,10 +1,10 @@
-#这里统计年龄与性别
+
 import pandas as pd
 import numpy as np
-#读取all.csv文件中的数据
-data = pd.read_csv('/home/tangwenhao/TRC/Brain/all.csv')
-data_all = pd.read_csv('/home/tangwenhao/TRC/Brain/data_ADNI.csv')
-#输出数据的前5行
+
+data = pd.read_csv('/Brain/all.csv')
+data_all = pd.read_csv('/Brain/data_ADNI.csv')
+
 age_CN = []
 age_AD = []
 age_MCI = []
@@ -17,7 +17,7 @@ sex_MCI_female = 0
 count = 0
 for i in range(len(data)):
     if data['group'][i] == 'CN':
-        #读取data_all中imageUID等于data['imageUID_T2'][i]的记录中的年龄
+
         age = data_all[data_all['imageUID'] == data['imageUID_T2'][i]]['subjectAge'].values
         age_CN.append(age)
         sex = data_all[data_all['imageUID'] == data['imageUID_T2'][i]]['sex'].values
@@ -41,7 +41,7 @@ for i in range(len(data)):
             sex_MCI_female += 1
         else:
             sex_MCI_male += 1
-#计算age_CN的均值与标准差
+
 age_CN = np.array(age_CN)
 age_CN = age_CN.flatten()
 mean_age_CN = np.mean(age_CN)
