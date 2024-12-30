@@ -2,6 +2,7 @@ MFPENet
 code for KAGAN: Multimodal Classification of Alzheimer's Disease Based on Kolmogorov-Arnold Graph Attention Network
 
 Run the demo
+bash git clone https://github.com/sheeprra/KAGAN.git
 python data_peizhun.py
 python data_GetInf.py
 python data_train.py
