@@ -1,4 +1,4 @@
-MFPENet
+# MFPENet
 code for KAGAN: Multimodal Classification of Alzheimer's Disease Based on Kolmogorov-Arnold Graph Attention Network
 
 ## Requirements
