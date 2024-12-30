@@ -1,4 +1,4 @@
-# MFPENet
+# KAGAN
 code for KAGAN: Multimodal Classification of Alzheimer's Disease Based on Kolmogorov-Arnold Graph Attention Network
 
 ## Requirements
@@ -15,10 +15,14 @@ Pytorch-Geometric
 ```bash
 bash git clone https://github.com/sheeprra/KAGAN.git
 python data_peizhun.py
+python data_pix_N4.py
 python data_GetInf.py
-python data_train.py
+python age_sex.py
+python data_CCA.py
+python kan.py
+python combined_train.py
 ```
-`data_peizhun.py` and `data_GetInf.py` are used for image preprocessing, `data_train.py` is used for model training.
+
 
 
 ## Datasets
