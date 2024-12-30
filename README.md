@@ -22,7 +22,7 @@ python data_CCA.py
 python kan.py
 python combined_train.py
 ```
-
+`data_peizhun.py`, `data_pix_N4.py`, `data_GetInf.py`, `age_sex.py` and `data_CCA.py` are used for pre-processing, and `kan.py` and `combined_train.py` are used for model training.
 
 
 ## Datasets
