@@ -1,74 +1,22 @@
-"""
-该部分是获取AAL图谱对应的MRI部分的信息
-
-"""
 import os
 
 import SimpleITK as sitk
 
-#from skimage.feature import greycomatrix
 from itertools import product
 import matplotlib.pyplot as plt
 from skimage.feature import graycomatrix, graycoprops
 
-# #读取/home/tangwenhao/TRC/0.nii.gz
-# path = '/home/tangwenhao/TRC/Brain/AAL_C.nii'
-# #读取图像
-# image = sitk.ReadImage(path)
-# #获取图像的大小
-# print(image.GetSize())
-# #获取图像的像素间隔
-# print(image.GetSpacing())
-# #获取图像的方向
-# print(image.GetDirection())
-# #获取图像的原点
-# print(image.GetOrigin())
 
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import os
-#获取/home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T1下的所有文件
-# source_path = '/home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T1'
-# for _,_,files in os.walk(source_path):
-#     for file in files:
-#         print(os.path.join(source_path,file))
-#         #使用正则表达式提取file开头的数字
-#         i = int(file.split('.')[0])
-#         i = str(i)
-#         print(type(i),i) 
-# exit(0)
 
-# 输出结果
-# print(roi_info_df)
-#保存结果
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/AD/T1
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/AD/T2
-
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/CN/T1
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/CN/T2
-
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/MCI/T1
-# /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/MCI/T1
-
-
-#如果os.path.join(root_path,str(i),'t1_roi_info.csv')路径不存在，则创建该路径
-
-#向csv文件中追加数据
-# roi_info_df.to_csv(os.path.join(root_path,str(i),'t1_roi_info.csv'), mode='a', header=False, index=False)
-# exit(0)
-
-
-
-# 加载AAL图谱
-aal_path = '/home/tangwenhao/TRC/Brain/AAL_C.nii.gz'
+aal_path = '/Brain/AAL_C.nii.gz'
 aal_img = nib.load(aal_path)
 aal_data = aal_img.get_fdata()
-#使用nib加载AAL图谱
 
 
-
-# print(aal_data.shape) -> (193, 229, 193)
 list_AAL_num = [0.0,2001.0,2002.0,2101.0,2102.0, 
 2111.0,2112.0,2201.0,2202.0,2211.0,2212.0,2301.0,2302.0,
 2311.0,2312.0,2321.0,2322.0,2331.0,2332.0,2401.0,2402.0,
@@ -87,106 +35,72 @@ list_AAL_num = [0.0,2001.0,2002.0,2101.0,2102.0,
 ]
 list_AAL_num_array = np.array(list_AAL_num, dtype=np.float64)
 
-# 对 aal_data 中每一个数值，找到 list_AAL_num 中最近的数值
+
 def find_nearest_label(value):
-    # 计算当前值与 list_AAL_num_array 中所有值的差距
     diff = np.abs(list_AAL_num_array - value)
-    # 返回最小差距对应的 list_AAL_num 中的数值,np.argmin返回最小值的索引
     return list_AAL_num_array[np.argmin(diff)]
 
-# 使用 numpy 的向量化函数对 aal_data 进行逐元素操作
+
 vectorized_find_nearest = np.vectorize(find_nearest_label,otypes=[np.float64])
-#获取变换之后的aal_data
 aal_data_modified = vectorized_find_nearest(aal_data)
 
-# 获取AAL图谱中的所有标签值（即感兴趣区域的编号）
-# aal_labels = np.unique(aal_data)
 aal_labels = np.unique(aal_data_modified)
 
 
-# # 加载MNI152标准空间图像
-# mni152_path = '/home/tangwenhao/TRC/data/mni_icbm152_nlin_sym_09c/mni_icbm152_t1_tal_nlin_sym_09c.nii'
-# mni152_img = nib.load(mni152_path)
-
-
-
-# 加载原始脑部MRI图像
-#获取/home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T1下的所有文件
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T1
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T2
-
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/CN/T1
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/CN/T2
-
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/MCI/T1
-            # /home/tangwenhao/TRC/data/brain_all_data_PeiZhun/MCI/T2
-source_path = '/home/tangwenhao/TRC/data/brain_all_data_PeiZhun/AD/T1'
+source_path = '/data/brain_all_data_PeiZhun/AD/T1'
 for _,_,files in os.walk(source_path):
     for file in files:
         brain_mri_path = os.path.join(source_path,file)
         brain_mri_img = nib.load(brain_mri_path)
         brain_mri_data = brain_mri_img.get_fdata()
-        # print(brain_mri_data.shape) -> (193, 229, 193)
         i = int(file.split('.')[0])
         i = str(i)
         roi_info = []
 
-        # 遍历每个标签值，提取对应ROI的信息
         for label in aal_labels:
-            if label == 0:  # 跳过背景
+            if label == 0:  
                 continue
 
-            # 提取当前ROI的掩码 Ture or False  shape = (193, 229, 193)
             roi_mask = (aal_data_modified == label)
 
-            # 找到数据中的最小和最大灰度值 进行归一化处理
             min_val = brain_mri_data.min()
             max_val = brain_mri_data.max()
 
-            # 将数据归一化到 0-255 范围
             brain_mri_data_normalized = ((brain_mri_data - min_val) / (max_val - min_val) * 255).astype(np.uint8)
 
-            # 2. 初始化GLCM
-            levels = 256  # 灰度级别为256
-            glcm = np.zeros((levels, levels,1,3), dtype=int)  # 初始化灰度共生矩阵
+           
+            levels = 256  
+            glcm = np.zeros((levels, levels,1,3), dtype=int)  
 
-        # 遍历3D MRI数据中的每个方向（例如，(1, 0, 0), (0, 1, 0), (0, 0, 1)）
+      
             for x in range(brain_mri_data.shape[0] - 1):
                 for y in range(brain_mri_data.shape[1] - 1):
                     for z in range(brain_mri_data.shape[2] - 1):
-                        if roi_mask[x, y, z]:  # 只考虑ROI区域
+                        if roi_mask[x, y, z]: 
                             current_pixel_value = brain_mri_data_normalized[x, y, z]
                             
-                            # 检查相邻像素（假设检查x方向）
-                            if roi_mask[x + 1, y, z]:  # 确保相邻像素也在ROI区域
+                         
+                            if roi_mask[x + 1, y, z]: 
                                 adjacent_pixel_value = brain_mri_data_normalized[x + 1, y, z]
                                 glcm[current_pixel_value, adjacent_pixel_value,0,0] += 1
-                                # glcm[adjacent_pixel_value, current_pixel_value,0,0] += 1  # 对称GLCM
 
-                            # 检查y方向
                             if roi_mask[x, y + 1, z]:
                                 adjacent_pixel_value = brain_mri_data_normalized[x, y + 1, z]
                                 glcm[current_pixel_value, adjacent_pixel_value,0,1] += 1
-                                # glcm[adjacent_pixel_value, current_pixel_value,0,1] += 1
 
-                            # 检查z方向
                             if roi_mask[x, y, z + 1]:
                                 adjacent_pixel_value = brain_mri_data_normalized[x, y, z + 1]
                                 glcm[current_pixel_value, adjacent_pixel_value,0,2] += 1
-                                # glcm[adjacent_pixel_value, current_pixel_value,0,2] += 1
-            # print(glcm.shape)#256 256
-            # 3. 计算GLCM的统计特征
-        
-            # tt = graycoprops(glcm,properties=['contrast', 'dissimilarity', 'homogeneity', 'energy', 'correlation', 'ASM'])
-            contrast = graycoprops(glcm, 'contrast')#对比度
-            dissimilarity = graycoprops(glcm, 'dissimilarity')#相异性
-            homogeneity = graycoprops(glcm, 'homogeneity')#同质性
-            energy = graycoprops(glcm, 'energy')#能量
-            correlation = graycoprops(glcm, 'correlation')#相关性
-            ASM = graycoprops(glcm, 'ASM')#角二阶矩
-            entropy = -np.sum(glcm * np.log2(glcm + (glcm == 0)))    # 计算熵 度量灰度分布的随机性，值越高说明纹理越复杂。
+
+            contrast = graycoprops(glcm, 'contrast')
+            dissimilarity = graycoprops(glcm, 'dissimilarity')
+            homogeneity = graycoprops(glcm, 'homogeneity')
+            energy = graycoprops(glcm, 'energy')
+            correlation = graycoprops(glcm, 'correlation')
+            ASM = graycoprops(glcm, 'ASM')
+            entropy = -np.sum(glcm * np.log2(glcm + (glcm == 0)))  
             print(contrast, dissimilarity, homogeneity, energy, correlation, ASM, entropy)
-            #计算contrast的均值
+
             contrast_mean = np.mean(contrast)
             dissimilarity_mean = np.mean(dissimilarity)
             homogeneity_mean = np.mean(homogeneity)
@@ -195,19 +109,17 @@ for _,_,files in os.walk(source_path):
             ASM_mean = np.mean(ASM)
             print(contrast_mean, dissimilarity_mean, homogeneity_mean, energy_mean, correlation_mean, ASM_mean, entropy)
 
-            # 在原始MRI图像中应用该掩码，获取该ROI中的数据  此处获取到一维数据
-            roi_data = brain_mri_data[roi_mask]
 
-            # 计算统计信息，如均值和标准差
+            roi_data = brain_mri_data[roi_mask]
             mean_intensity = np.mean(roi_data)
             std_intensity = np.std(roi_data)
 
-                # 将结果保存到列表中
+         
             roi_info.append({
                 'ROI_Label': int(label),
-                'Mean_Intensity': mean_intensity,#均值
-                'Std_Intensity': std_intensity,#方差
-                'Voxel_Count': np.sum(roi_mask), #体积大小
+                'Mean_Intensity': mean_intensity,
+                'Std_Intensity': std_intensity,
+                'Voxel_Count': np.sum(roi_mask), 
                 'contrast_mean': contrast_mean,
                 'dissimilarity_mean': dissimilarity_mean,
                 'homogeneity_mean': homogeneity_mean,
@@ -215,48 +127,13 @@ for _,_,files in os.walk(source_path):
                 'correlation_mean': correlation_mean,
                 'ASM_mean': ASM_mean,
                 'entropy': entropy
-                
-                # #这里记录T2加权图像的信息    
-                # # 'ROI_Label': int(label),
-                # 'Mean_Intensity': mean_intensity,#均值
-                # # 'Std_Intensity': std_intensity,#方差
-                # 'Voxel_Count': np.sum(roi_mask), #体积大小
-                # # 'contrast_mean': contrast_mean,
-                # # 'dissimilarity_mean': dissimilarity_mean,
-                # # 'homogeneity_mean': homogeneity_mean,
-                # # 'energy_mean': energy_mean,
-                # # 'correlation_mean': correlation_mean,
-                # # 'ASM_mean': ASM_mean,
-                # # 'entropy': entropy
 
-                # # 这里记录T1加权图像的信息
-                # # 'ROI_Label': int(label),
-                # 'Mean_Intensity': mean_intensity,#均值
-                # # 'Std_Intensity': std_intensity,#方差
-                # # 'Voxel_Count': np.sum(roi_mask), #体积大小
-                # 'contrast_mean': contrast_mean,
-                # # 'dissimilarity_mean': dissimilarity_mean,
-                # # 'homogeneity_mean': homogeneity_mean,
-                # # 'energy_mean': energy_mean,
-                # # 'correlation_mean': correlation_mean,
-                # # 'ASM_mean': ASM_mean,
-                # 'entropy': entropy
             })
             print(roi_info)
-            # 将结果转换为Pandas DataFrame，便于后续分析或保存
+
         roi_info_df = pd.DataFrame(roi_info)
-        # 输出结果
-        # print(roi_info_df)
-        #保存结果
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/AD/T1
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/AD/T2
-
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/CN/T1
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/CN/T2
-
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/MCI/T1
-        # /home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/MCI/T1
-        tar_path = '/home/tangwenhao/TRC/data/brain_all_data_TeZhengTiQu/AD/T1'
+       
+        tar_path = '/data/brain_all_data_TeZhengTiQu/AD/T1'
         if not os.path.exists(os.path.join(tar_path,i)):
             os.makedirs(os.path.join(tar_path,i))
         roi_info_df.to_csv(os.path.join(tar_path,i,'t1_roi_info.csv'),  mode='a',header=False,index=False)
