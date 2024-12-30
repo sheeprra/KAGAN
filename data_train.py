@@ -10,9 +10,9 @@ import SimpleITK as sitk
 import numpy as np
 
 class Net(torch.nn.Module):
-    def __init__(self):
+    def __init__(self，int N):
         super(Net, self).__init__()
-        self.conv1 = torch.nn.Conv2d(in_channels=160,out_channels=320,kernel_size=7,stride=2,padding=3)
+        self.conv1 = torch.nn.Conv2d(in_channels=N,out_channels=320,kernel_size=7,stride=2,padding=3)
         self.pool1 = torch.nn.MaxPool2d(2, 2)
         self.conv2 = torch.nn.Conv2d(in_channels=320,out_channels=640,kernel_size=3,stride=2,padding=1)
         self.pool2 = torch.nn.MaxPool2d(2, 2)
@@ -33,42 +33,42 @@ class Net(torch.nn.Module):
         x = self.fc3(x)
         return x
     
-# 加载数据
-train_dir = '/home/tangwenhao/TRC/data/Brain_data/train'
-test_dir = '/home/tangwenhao/TRC/data/Brain_data/test'
-new_size = (160, 256, 256)  # 设置新的图像大小
+
+train_dir = '/data/Brain_data/train'
+test_dir = '/data/Brain_data/test'
+new_size = (160, 256, 256)
 train_dataset = BrainDataset(root_dir=train_dir,new_size=new_size)
 test_dataset = BrainDataset(root_dir=test_dir,new_size=new_size)
 print(len(train_dataset),len(test_dataset))
 
 print(train_dataset[0][0].shape)
-# 创建数据加载器
+
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 print(len(train_dataloader),len(test_dataloader))
 
 device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
-# 创建模型
+
 model = Net().to(device)
-# 定义损失函数
+
 criterion = torch.nn.CrossEntropyLoss()
-# 定义优化器
+
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# 训练模型
+
 num_epochs = 10
 total_step = len(train_dataloader)
 for epoch in range(num_epochs):
     model.train()
     for i, (images, labels) in enumerate(train_dataloader):
-        # 前向传播
+
         images = images.to(device)
         labels = labels.to(device)
         outputs = model(images)
         loss = criterion(outputs, labels)
         
-        # 反向传播和优化
+  
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -77,7 +77,7 @@ for epoch in range(num_epochs):
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
             
-    # 测试模型
+
     model.eval()
     with torch.no_grad():
         correct = 0
